@@ -2,20 +2,20 @@
   "name": "TradeFlow",
   "short_name": "TradeFlow",
   "description": "Track it. Manage it. Grow it.",
-  "start_url": "https://renaxalv.github.io/TradeFlow/",
+  "start_url": "https://tradeflow-app.github.io/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#04070f",
   "theme_color": "#04070f",
   "icons": [
     {
-      "src": "web-app-manifest-192x192.png",
+      "src": "icons/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "web-app-manifest-512x512.png",
+      "src": "icons/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
