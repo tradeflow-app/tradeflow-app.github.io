@@ -12,7 +12,8 @@
   <link rel="apple-touch-icon" href="icons/web-app-manifest-192x192.png">
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { width:100%; height:100%; background:#04070f; }
+    html, body { width:100%; height:100%; overflow:hidden; background:#04070f; }
+    iframe { width:100%; height:100%; border:none; display:block; position:fixed; inset:0; }
     #splash {
       position:fixed; inset:0; z-index:9999;
       background:#04070f;
@@ -59,8 +60,13 @@
     </div>
   </div>
 
+  <iframe
+    id="app"
+    src="https://script.google.com/macros/s/AKfycbwcieOp6PLjTbAhXM7m_86oKyyjL_c1TZ8DhAxgRs5r9VFsRc82y5W75rc2_bLEedEx/exec"
+    allow="fullscreen"
+  ></iframe>
+
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwcieOp6PLjTbAhXM7m_86oKyyjL_c1TZ8DhAxgRs5r9VFsRc82y5W75rc2_bLEedEx/exec';
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const bannerDismissed = (() => { try { return localStorage.getItem('tf_banner_dismissed'); } catch(e) { return false; } })();
@@ -93,11 +99,12 @@
       try { localStorage.setItem('tf_banner_dismissed', '1'); } catch(e) {}
     }
 
+    // Some o splash após 4s
     setTimeout(() => {
       const splash = document.getElementById('splash');
       splash.style.opacity = '0';
-      setTimeout(() => { window.location.href = GAS_URL; }, 500);
-    }, 3000);
+      setTimeout(() => splash.style.display = 'none', 500);
+    }, 4000);
   </script>
 
 </body>
