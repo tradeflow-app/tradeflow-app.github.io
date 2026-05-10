@@ -81,6 +81,9 @@
       setTimeout(() => splash.style.display = 'none', 500);
     }
 
+    // Timeout de segurança — some o splash após 8s mesmo sem o iframe carregar
+    setTimeout(hideSplash, 8000);
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
