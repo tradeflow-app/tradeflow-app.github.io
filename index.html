@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TradeFlow</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#04070f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TradeFlow">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; height:100%; overflow:hidden; background:#04070f; }
+    iframe {
+      width:100%; height:100%;
+      border:none; display:block;
+      position:fixed; inset:0;
+    }
+    #splash {
+      position:fixed; inset:0; z-index:9999;
+      background:#04070f;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:20px;
+      transition:opacity .5s ease;
+    }
+    #splash img { width:80px; height:80px; border-radius:20px; }
+    #splash .name {
+      font-family: system-ui, sans-serif;
+      font-size:28px; font-weight:800; color:#f0f2ff; letter-spacing:-0.5px;
+    }
+    #splash .name span { color:#38bdf8; }
+    #splash .sub { font-family:system-ui,sans-serif; font-size:13px; color:#4a5270; }
+    .loader-bar { width:120px; height:2px; background:rgba(255,255,255,.07); border-radius:10px; overflow:hidden; }
+    .loader-bar-fill { height:100%; background:linear-gradient(90deg,#7c6bff,#38bdf8,#34d399); border-radius:10px; animation:lBar 1.4s ease-in-out infinite; }
+    @keyframes lBar { 0%{width:0%;margin-left:0%} 50%{width:65%;margin-left:17%} 100%{width:0%;margin-left:100%} }
+  </style>
+</head>
+<body>
+
+  <div id="splash">
+    <img src="https://raw.githubusercontent.com/renaxalv/Icons/refs/heads/main/tradeflow-logo.ico" alt="TradeFlow">
+    <div class="name">Trade<span>Flow</span></div>
+    <div class="sub">Track it. Manage it. Grow it.</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+
+  <!-- BOTÃO FIXO INSTALAR -->
+  <div id="installBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99998;
+    background:linear-gradient(135deg,rgba(124,107,255,0.15),rgba(56,189,248,0.1));
+    border-bottom:1px solid rgba(124,107,255,0.25);
+    padding:10px 16px;gap:10px;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="https://raw.githubusercontent.com/renaxalv/Icons/refs/heads/main/tradeflow-logo.ico" style="width:28px;height:28px;border-radius:8px">
+      <div>
+        <div style="font-family:system-ui,sans-serif;font-size:12px;font-weight:700;color:#f0f2ff">Instalar TradeFlow</div>
+        <div id="installBannerMsg" style="font-family:system-ui,sans-serif;font-size:10px;color:#8892b0">Acesso rápido pela tela inicial</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button id="installBannerBtn" onclick="instalarApp()" style="background:linear-gradient(135deg,#7c6bff,#38bdf8);border:none;border-radius:8px;padding:6px 14px;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Instalar</button>
+      <button onclick="fecharBanner()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 10px;color:#8892b0;font-size:12px;cursor:pointer">✕</button>
+    </div>
+  </div>
+
+  <iframe
+    id="app"
+    src="https://script.google.com/macros/s/AKfycbwcieOp6PLjTbAhXM7m_86oKyyjL_c1TZ8DhAxgRs5r9VFsRc82y5W75rc2_bLEedEx/exec"
+    allow="fullscreen"
+    onload="hideSplash()"
+  ></iframe>
+
+  <script>
+    function hideSplash() {
+      const splash = document.getElementById('splash');
+      splash.style.opacity = '0';
+      setTimeout(() => splash.style.display = 'none', 500);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Mostra botão instalar só quando o prompt estiver disponível
+      if (!isStandalone && !bannerDismissed && !isIOS) {
+        document.getElementById('installBannerBtn').style.display = 'block';
+      }
+    });
+
+    function instalarApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; fecharBanner(); fecharToast(); });
+      }
+    }
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const bannerDismissed = (() => { try { return localStorage.getItem('tf_banner_dismissed'); } catch(e) { return false; } })();
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isStandalone && !bannerDismissed && !isIOS) {
+        document.getElementById('installBannerBtn').style.display = 'block';
+      }
+    });
+
+    function instalarApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; fecharBanner(); fecharToast(); });
+      }
+    }
+
+    function fecharBanner() {
+      document.getElementById('installBanner').style.display = 'none';
+      try { localStorage.setItem('tf_banner_dismissed', '1'); } catch(e) {}
+    }
+
+    function fecharToast() {
+      document.getElementById('installToast').style.display = 'none';
+    }
+
+    if (!isStandalone && !bannerDismissed) {
+      const banner = document.getElementById('installBanner');
+      banner.style.display = 'flex';
+      if (isIOS) {
+        document.getElementById('installBannerMsg').innerHTML = 'Compartilhar → Adicionar à Tela de Início';
+        document.getElementById('installBannerBtn').style.display = 'none';
+      } else {
+        // Android: esconde botão até o deferredPrompt estar disponível
+        document.getElementById('installBannerBtn').style.display = 'none';
+      }
+    }
+  </script>
+
+  <div id="installToast" style="display:none;position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;
+    background:#0d1224;border:1px solid rgba(124,107,255,0.3);border-radius:16px;
+    padding:14px 18px;gap:12px;align-items:center;
+    box-shadow:0 8px 32px rgba(0,0,0,0.6);width:calc(100% - 48px);max-width:360px;
+    animation:toastDown .4s cubic-bezier(.34,1.56,.64,1) both;">
+    <img src="https://raw.githubusercontent.com/renaxalv/Icons/refs/heads/main/tradeflow-logo.ico" style="width:36px;height:36px;border-radius:10px;flex-shrink:0">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:system-ui,sans-serif;font-size:13px;font-weight:700;color:#f0f2ff">Instalar TradeFlow</div>
+      <div id="installMsg" style="font-family:system-ui,sans-serif;font-size:11px;color:#8892b0;margin-top:2px">Adicione à tela inicial para acesso rápido</div>
+    </div>
+    <div style="display:flex;gap:6px;flex-shrink:0">
+      <button id="installBtn" onclick="instalarApp()" style="background:linear-gradient(135deg,#7c6bff,#38bdf8);border:none;border-radius:8px;padding:7px 14px;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Instalar</button>
+      <button onclick="fecharToast()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:7px 10px;color:#8892b0;font-size:12px;cursor:pointer">✕</button>
+    </div>
+  </div>
+
+  <style>
+    @keyframes toastDown { from{transform:translateX(-50%) translateY(-20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+  </style>
+</body>
+</html>
